@@ -6,6 +6,7 @@ const nextConfig = {
   },
   trailingSlash: true,
   distDir: 'out',
+  assetPrefix: undefined,
 };
 
 module.exports = nextConfig;
