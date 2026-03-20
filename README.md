@@ -1,6 +1,6 @@
 # Smoodh - Premium Cinematic Website
 
-A stunning, ultra-premium single-page scrollytelling website for Smoodh by Parlé Agro. Built with Next.js 14, featuring cinematic scroll-driven animations and a premium user experience.
+A stunning, ultra-premium single-page scrollytelling website for Smoodh by **Atharv Agro**. Built with Next.js 14, featuring cinematic scroll-driven animations and a premium user experience.
 
 ## 🎬 Features
 - **Cinematic Scrolling**: Smooth, film-quality scroll animations
@@ -91,7 +91,7 @@ npm run export
 
 ## 📧 Contact
 
-Built with ❤️ for Smoodh by Parlé Agro
+Built with ❤️ for Smoodh by **Atharv Agro**
 
 ---
 
