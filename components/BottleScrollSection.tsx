@@ -57,8 +57,8 @@ export default function BottleScrollSection() {
         target: sectionRef,
         offset: ['start start', 'end end'],
     })
-
-    const smoothProg = useSpring(scrollYProgress, { stiffness: 25, damping: 25, mass: 1.2, restDelta: 0.0005 })
+    const smoothProg = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.5, restDelta: 0.0001 })
+    const canvasSizeRef = useRef({ w: 0, h: 0 });
 
     // Step 1: Preload images strictly into browser memory for the canvas
     useEffect(() => {
@@ -92,7 +92,7 @@ export default function BottleScrollSection() {
                 checkAllDone()
             }
             
-            img.onerror = (error) => {
+            img.onerror = () => {
                 console.warn(`Failed to load frame ${i}, retrying via absolute URL...`)
                 // Explicit absolute path to bypass any SPA strict routing boundaries
                 img.src = `${window.location.origin}/frames/ezgif-frame-${frameNum}.jpg?force=1`
@@ -137,34 +137,39 @@ export default function BottleScrollSection() {
     useEffect(() => {
         const canvas = canvasRef.current
         if (!canvas) return
-        const ctx = canvas.getContext('2d', { alpha: false }) // Optimize for opaque images
+        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true }) // desynchronized for lower latency
         if (!ctx) return
 
         let animationFrameId: number
         let lastDrawnFrame = -1
 
+        const updateSize = () => {
+             if (canvas.parentElement) {
+                 const w = canvas.parentElement.clientWidth;
+                 const h = canvas.parentElement.clientHeight;
+                 canvas.width = w;
+                 canvas.height = h;
+                 canvasSizeRef.current = { w, h };
+             }
+        };
+
+        window.addEventListener('resize', updateSize);
+        updateSize();
+
         const render = () => {
             animationFrameId = requestAnimationFrame(render)
 
             const currentFrame = Math.round(frameIndexRef.current) || 0
+            const { w, h } = canvasSizeRef.current;
 
-            // Force redraw on resize via window size check
-            const w = canvas.parentElement?.clientWidth || window.innerWidth
-            const h = canvas.parentElement?.clientHeight || window.innerHeight
+            if (w === 0 || h === 0) return;
 
-            const sizeChanged = canvas.width !== w || canvas.height !== h
-
-            // Only draw if frame changed or canvas resized
-            if (currentFrame !== lastDrawnFrame || sizeChanged) {
-                if (sizeChanged) {
-                    canvas.width = w
-                    canvas.height = h
-                }
-
+            // Only draw if frame changed (No more sizeChanged checks in loop)
+            if (currentFrame !== lastDrawnFrame) {
                 const img = imagesRef.current[currentFrame]
                 if (img && img.complete && img.naturalWidth > 0) {
 
-                    // Object-fit: cover logic for Canvas
+                    // Object-fit: cover logic
                     const imgRatio = img.naturalWidth / img.naturalHeight
                     const canvasRatio = w / h
 
@@ -181,10 +186,9 @@ export default function BottleScrollSection() {
                         offsetY = (h - drawH) / 2
                     }
 
-                    // Draw Frame
                     ctx.drawImage(img, offsetX, offsetY, drawW, drawH)
 
-                    // Draw Vignette directly onto Canvas (Huge performance boost over CSS overlays)
+                    // Draw Vignette
                     const gradient = ctx.createRadialGradient(w / 2, h / 2, h * 0.2, w / 2, h / 2, h * 0.8)
                     gradient.addColorStop(0, 'rgba(0,0,0,0)')
                     gradient.addColorStop(0.7, 'rgba(0,0,0,0.15)')
@@ -194,7 +198,6 @@ export default function BottleScrollSection() {
 
                     lastDrawnFrame = currentFrame
                 } else if (!imagesLoaded) {
-                    // Fill black safely while loading
                     ctx.fillStyle = '#0A0A0A'
                     ctx.fillRect(0, 0, w, h)
                 }
@@ -205,8 +208,10 @@ export default function BottleScrollSection() {
 
         return () => {
             cancelAnimationFrame(animationFrameId)
+            window.removeEventListener('resize', updateSize);
         }
     }, [imagesLoaded])
+
 
     const s = storyScenes[scene]
 
