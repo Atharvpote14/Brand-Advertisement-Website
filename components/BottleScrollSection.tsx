@@ -71,7 +71,7 @@ export default function BottleScrollSection() {
             const img = new Image()
             const frameNum = String(i).padStart(3, '0')
             img.src = `/frames/ezgif-frame-${frameNum}.jpg`
-            img.crossOrigin = 'anonymous' // Add this for CORS issues
+            // Removed crossOrigin attribute to prevent CORS issues on same-origin Netlify hosting
             
             img.onload = () => {
                 loadedCount++
