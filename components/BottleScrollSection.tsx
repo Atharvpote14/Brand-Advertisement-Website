@@ -71,6 +71,7 @@ export default function BottleScrollSection() {
             const img = new Image()
             const frameNum = String(i).padStart(3, '0')
             img.src = `/frames/ezgif-frame-${frameNum}.jpg`
+            img.crossOrigin = 'anonymous' // Add this for CORS issues
             
             img.onload = () => {
                 loadedCount++
@@ -83,8 +84,20 @@ export default function BottleScrollSection() {
             
             img.onerror = (error) => {
                 console.error(`Failed to load frame ${i}:`, error)
-                loadedCount++
-                if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true)
+                // Try alternative path
+                img.src = `/frames/ezgif-frame-${frameNum}.jpg?v=1` // Add cache busting
+                img.onload = () => {
+                    loadedCount++
+                    console.log(`Loaded frame ${i}/${TOTAL_FRAMES} (retry)`)
+                    if (loadedCount === TOTAL_FRAMES) {
+                        console.log('All frames loaded!')
+                        setImagesLoaded(true)
+                    }
+                }
+                img.onerror = () => {
+                    loadedCount++
+                    if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true)
+                }
             }
             
             imgs.push(img)
@@ -232,6 +245,24 @@ export default function BottleScrollSection() {
                         display: 'block'
                     }}
                 />
+                
+                {/* Fallback image for static export */}
+                {!imagesLoaded && (
+                    <img
+                        src="/frames/ezgif-frame-001.jpg"
+                        alt="Smoodh Bottle"
+                        style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            maxWidth: '80%',
+                            maxHeight: '80%',
+                            objectFit: 'contain',
+                            zIndex: 5
+                        }}
+                    />
+                )}
 
                 {/* Text overlays */}
                 <div
