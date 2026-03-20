@@ -3,7 +3,6 @@
 A stunning, ultra-premium single-page scrollytelling website for Smoodh by Parlé Agro. Built with Next.js 14, featuring cinematic scroll-driven animations and a premium user experience.
 
 ## 🎬 Features
-
 - **Cinematic Scrolling**: Smooth, film-quality scroll animations
 - **Custom Cursor**: Specially designed orange cursor with smooth transitions
 - **Glassmorphism UI**: Modern glass-morphism effects throughout
@@ -24,8 +23,8 @@ A stunning, ultra-premium single-page scrollytelling website for Smoodh by Parl�
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd brand-advertisement-website
+git clone https://github.com/Atharvpote14/Brand-Advertisement-Website.git
+cd Brand-Advertisement-Website
 
 # Install dependencies
 npm install
