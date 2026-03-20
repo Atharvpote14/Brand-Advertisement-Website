@@ -63,9 +63,10 @@ export default function BottleScrollSection() {
     // Step 1: Preload images strictly into browser memory for the canvas
     useEffect(() => {
         let loadedCount = 0
+        let successCount = 0
         const imgs: HTMLImageElement[] = []
         
-        console.log('Starting to load frames...')
+        console.log('Starting to load frames...');
         
         for (let i = 1; i <= TOTAL_FRAMES; i++) {
             const img = new Image()
@@ -73,30 +74,37 @@ export default function BottleScrollSection() {
             img.src = `/frames/ezgif-frame-${frameNum}.jpg`
             // Removed crossOrigin attribute to prevent CORS issues on same-origin Netlify hosting
             
+            const checkAllDone = () => {
+                if (loadedCount === TOTAL_FRAMES) {
+                    if (successCount > 0) {
+                        console.log(`Finished loading! Successfully loaded ${successCount}/${TOTAL_FRAMES}`);
+                        setImagesLoaded(true);
+                    } else {
+                        console.error('CRITICAL ERROR: All frames failed to load.');
+                        // Let imagesLoaded remain false so the fallback static image stays visible
+                    }
+                }
+            };
+
             img.onload = () => {
                 loadedCount++
-                console.log(`Loaded frame ${i}/${TOTAL_FRAMES}`)
-                if (loadedCount === TOTAL_FRAMES) {
-                    console.log('All frames loaded!')
-                    setImagesLoaded(true)
-                }
+                successCount++
+                checkAllDone()
             }
             
             img.onerror = (error) => {
-                console.error(`Failed to load frame ${i}:`, error)
-                // Try alternative path
-                img.src = `/frames/ezgif-frame-${frameNum}.jpg?v=1` // Add cache busting
+                console.warn(`Failed to load frame ${i}, retrying via absolute URL...`)
+                // Explicit absolute path to bypass any SPA strict routing boundaries
+                img.src = `${window.location.origin}/frames/ezgif-frame-${frameNum}.jpg?force=1`
+                
                 img.onload = () => {
                     loadedCount++
-                    console.log(`Loaded frame ${i}/${TOTAL_FRAMES} (retry)`)
-                    if (loadedCount === TOTAL_FRAMES) {
-                        console.log('All frames loaded!')
-                        setImagesLoaded(true)
-                    }
+                    successCount++
+                    checkAllDone()
                 }
                 img.onerror = () => {
                     loadedCount++
-                    if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true)
+                    checkAllDone()
                 }
             }
             
