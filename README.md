@@ -3,6 +3,7 @@
 A stunning, ultra-premium single-page scrollytelling website for Smoodh by **Atharv Agro**. Built with Next.js 14, featuring cinematic scroll-driven animations and a premium user experience.
 
 ## 🎬 Features
+
 - **Cinematic Scrolling**: Smooth, film-quality scroll animations
 - **Custom Cursor**: Specially designed orange cursor with smooth transitions
 - **Glassmorphism UI**: Modern glass-morphism effects throughout
@@ -41,14 +42,14 @@ npm run export
 
 ## 🎯 Deployment
 
-### Vercel (Recommended)
+### Netlify (Recommended)
 1. Push code to GitHub
-2. Connect repository to Vercel
+2. Connect repository to Netlify
 3. Auto-deploy on push
 
-### Netlify
-1. Build: `npm run build && npm run export`
-2. Upload `out/` folder to Netlify
+### Vercel
+1. Build: `npm run build`
+2. Upload `out/` folder to Vercel
 
 ## 📁 Project Structure
 
