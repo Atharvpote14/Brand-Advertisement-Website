@@ -64,20 +64,29 @@ export default function BottleScrollSection() {
     useEffect(() => {
         let loadedCount = 0
         const imgs: HTMLImageElement[] = []
+        
+        console.log('Starting to load frames...')
+        
         for (let i = 1; i <= TOTAL_FRAMES; i++) {
             const img = new Image()
             const frameNum = String(i).padStart(3, '0')
             img.src = `/frames/ezgif-frame-${frameNum}.jpg`
+            
             img.onload = () => {
                 loadedCount++
+                console.log(`Loaded frame ${i}/${TOTAL_FRAMES}`)
                 if (loadedCount === TOTAL_FRAMES) {
+                    console.log('All frames loaded!')
                     setImagesLoaded(true)
                 }
             }
-            img.onerror = () => {
+            
+            img.onerror = (error) => {
+                console.error(`Failed to load frame ${i}:`, error)
                 loadedCount++
                 if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true)
             }
+            
             imgs.push(img)
         }
         imagesRef.current = imgs
@@ -193,9 +202,24 @@ export default function BottleScrollSection() {
                     width: '100%',
                     height: '100vh',
                     overflow: 'hidden',
-                    background: '#0A0A0A',
+                    background: imagesLoaded ? '#0A0A0A' : 'linear-gradient(135deg, #0A0A0A 0%, #1A0A0A 100%)',
                 }}
             >
+                {!imagesLoaded && (
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        color: '#FFB800',
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        textAlign: 'center',
+                        zIndex: 20
+                    }}>
+                        Loading Animation...
+                    </div>
+                )}
                 {/* Canvas Render Layer */}
                 <canvas
                     ref={canvasRef}
